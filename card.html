@@ -125,10 +125,13 @@
             display: block;
         }
 
-        #flagCanvas {
-            width: 96px;
-            height: 66px;
-            display: block;
+        #flagImage {
+            position: absolute;
+            top: 330px;
+            left: 42px;
+            width: 55px;
+            height: auto;
+            z-index: 10;
         }
     </style>
 </head>
@@ -168,7 +171,7 @@
     <p class="time_text" id="time"></p>
     <div class="id_image_data">
         <img draggable="false" class="id_image" src="images/XSZFxrl.png">
-        <canvas id="flagCanvas" class="flag_video"></canvas>
+        <img id="flagImage" src="/placeholder.svg" alt="Flag Animation">
         <canvas id="hologramFadeCanvas" class="id_image"></canvas>
         <div class="inset">
 
@@ -626,7 +629,7 @@
                 this.program = this.createProgram();
                 if (!this.program) return;
 
-                
+                this.textures.hologram = this.loadTexture('pictures/mid_background_main_dynamic.webp');
 
                 const vertices = new Float32Array([
                     -1.0, -1.0, 0.0, 1.0,
@@ -691,91 +694,9 @@
             }
         }
 
-        class FlagAnimator {
-            constructor(canvasId, frameCount = 60, frameDelayMs = 50) {
-                this.canvas = document.getElementById(canvasId);
-                this.ctx = this.canvas.getContext('2d');
-                this.frameCount = frameCount;
-                this.currentFrame = 0;
-                this.images = [];
-                this.isLoaded = false;
-                this.animationId = null;
-                // Wyższa wartość = wolniejsza animacja
-                // frameDelayMs = 50: bardzo szybka (20fps)
-                // frameDelayMs = 100: średnia prędkość (10fps)
-                // frameDelayMs = 150: wolna (6.6fps)
-                // frameDelayMs = 200: bardzo wolna (5fps)
-                this.frameDelayMs = frameDelayMs;
-                this.lastFrameTime = 0;
-                
-                this.loadImages();
-            }
-
-            loadImages() {
-                let loadedCount = 0;
-                
-                for (let i = 0; i < this.frameCount; i++) {
-                    const img = new Image();
-                    img.crossOrigin = 'anonymous';
-                    img.onload = () => {
-                        loadedCount++;
-                        if (loadedCount === this.frameCount) {
-                            this.isLoaded = true;
-                            this.startAnimation();
-                        }
-                    };
-                    img.onerror = () => {
-                        console.error(`Failed to load flag_pl_${i}.webp`);
-                        loadedCount++;
-                        if (loadedCount === this.frameCount) {
-                            this.isLoaded = true;
-                            this.startAnimation();
-                        }
-                    };
-                    img.src = `pictures/flag_pl_${i}.webp`;
-                    this.images.push(img);
-                }
-            }
-
-            startAnimation() {
-                const animate = (timestamp) => {
-                    if (!this.isLoaded) {
-                        this.animationId = requestAnimationFrame(animate);
-                        return;
-                    }
-                    
-                    if (timestamp - this.lastFrameTime >= this.frameDelayMs) {
-                        this.lastFrameTime = timestamp;
-                        
-                        // Wyczyść canvas
-                        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                        
-                        // Rysuj aktualny obrazek
-                        if (this.images[this.currentFrame] && this.images[this.currentFrame].complete) {
-                            this.ctx.drawImage(this.images[this.currentFrame], 0, 0, this.canvas.width, this.canvas.height);
-                        }
-                        
-                        // Przejdź do następnej klatki
-                        this.currentFrame = (this.currentFrame + 1) % this.frameCount;
-                    }
-                    
-                    this.animationId = requestAnimationFrame(animate);
-                };
-                
-                this.animationId = requestAnimationFrame(animate);
-            }
-
-            stop() {
-                if (this.animationId) {
-                    cancelAnimationFrame(this.animationId);
-                }
-            }
-        }
-
         let hologramRenderer;
         let hologramFadeEffect;
         let isGyroscopeEnabled = false;
-        let flagAnimator;
 
         function initHologram() {
             const canvas = document.getElementById('hologramCanvas');
@@ -795,14 +716,18 @@
         }
 
         function initFlagAnimation() {
-            const flagCanvas = document.getElementById('flagCanvas');
-            if (flagCanvas) {
-                flagCanvas.width = 96;
-                flagCanvas.height = 66;
-                // lub na niższą aby przyspieszyć (np. 50, 75)
-                // Wartość jest w milisekundach - ile czasu każda klatka jest wyświetlana
-                flagAnimator = new FlagAnimator('flagCanvas', 60, 50);
+            const flagElement = document.getElementById('flagImage');
+            const totalFrames = 60;
+            let currentFrame = 0;
+
+            function updateFlag() {
+                flagElement.src = `pictures/flag_pl_${currentFrame.toString().padStart(2, '0')}.webp`;
+                currentFrame = (currentFrame + 1) % totalFrames;
             }
+
+            // Zmień wartość 100 aby kontrolować prędkość animacji (w milisekundach)
+            // 50 = bardzo szybka, 100 = średnia, 150 = wolna, 200 = bardzo wolna
+            setInterval(updateFlag, 100);
         }
 
         function requestGyroscopePermission() {
@@ -911,7 +836,3 @@
 </script>
 </body>
 </html>
-
-
-
-
