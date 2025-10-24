@@ -1,5 +1,3 @@
-<!DOCTYPE html>
-<html lang="pl">
 <head>
     <title>mObywatel</title>
     <meta charset="UTF-8">
@@ -46,13 +44,13 @@
 
         .services_grid {
             display: flex;
-            justify-content: flex-start;
+            justify-content: flex-start; /* lub space-between */
             flex-wrap: nowrap;
             gap: 5px;
             width: 100%;
             margin: 0 auto;
             padding: 5px;
-            overflow-x: auto;
+            overflow-x: auto; /* POZWALA przewijać poziomo na małych ekranach */
             max-width: auto;
             float: left;
             padding-bottom: 0px;
@@ -91,7 +89,7 @@
             font-weight: 600;
             color: #1f2125;
             line-height: 1.2;
-            min-height: 3em;
+            min-height: 3em; /* zapewnia równe wysokości tekstu */
             padding-bottom: 0px;
         }
 
@@ -104,34 +102,20 @@
             padding-top: auto;
         }
 
+        /* Poprawiono style dla holograficznego orła - zmniejszono rozmiar i usunięto obrócenie */
         .holographic-eagle-container {
             position: absolute;
             width: 42px;
             height: 53px;
-            top: 361px;
-            left: 33px;
+            top: 311px; /* Przesunięto znacznie niżej */
+            left: 33px; /* Wyśrodkowano */
         }
 
         #hologramCanvas {
             width: 42px;
             height: 53px;
             display: block;
-        }
-
-        #hologramFadeCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            display: block;
-        }
-
-        #flagImage {
-            position: absolute;
-            top: 330px;
-            left: 42px;
-            width: 55px;
-            height: auto;
-            z-index: 10;
+            /* Usunięto transform: scaleY(-1) */
         }
     </style>
 </head>
@@ -142,6 +126,7 @@
             <p onclick="sendTo('home')" class="back_text">Wróć</p>
         </div>
         <p class="title_text">mDowód</p>
+        <img src="images/pomoctechniczna2.png" class="help_img" style="width: 20px;">
     </div>
 
     <div class="bottom_bar">
@@ -171,13 +156,13 @@
     <p class="time_text" id="time"></p>
     <div class="id_image_data">
         <img draggable="false" class="id_image" src="images/XSZFxrl.png">
-        <img id="flagImage" src="/placeholder.svg" alt="Flag Animation">
-        <canvas id="hologramFadeCanvas" class="id_image"></canvas>
         <div class="inset">
 
         </div>
         <div class="id_own_image" style="background-image: url('https://i.imgur.com/7vHo48p.jpg');"></div>
+        <img draggable="false" id="animatedFlag" src="/placeholder.svg" class="flag_video">
         
+        <!-- Zastąpiono GIF orła holograficznym orłem z 5 warstwami -->
         <div class="holographic-eagle-container eagle_video" id="holographicEagle">
             <canvas id="hologramCanvas" class="eagle_video"></canvas>
         </div>
@@ -233,17 +218,21 @@
     </div>
     
     <div class="other_grid" style="margin-top: 0px;">
+        <!-- Pierwszy bottom_holder z tabelką z danymi dokumentu -->
         <div class="bottom_holder" style="height: auto">
             
+                <!-- Seria i numer -->
                 <div class="confirm_box" style="border: none;">
                     <p class="box_top">Seria i numer</p>
                     <b><p class="box_value" id="seria_numer" style="font-size: 25px;"></p></b>
                     <button class="main_button">Kopiuj</button>
                 </div>
+                <!-- Organ wydający -->
                 <div class="confirm_box">
                     <p class="box_top">Termin ważności</p>
                     <b><p class="box_value" id="waznosc" style="font-size: 22px;"></p></b>
                 </div>
+                <!-- Termin ważności -->
                 <div class="confirm_box">
                     <p class="box_top">Data wydania</p>
                     <b><p class="box_value" id="wydany" style="font-size: 22px;"></p></b>
@@ -258,7 +247,7 @@
                 </div>
         </div>
         
-    
+        <!-- Drugi bottom_holder (rozwijany) -->
         <div class="bottom_holder info_holder" style="font-size: 20px;">
             <div class="bottom_grid">
                 <p class="bottom_text" style="color: #1f2125; margin-left: 0px;">Twoje dodatkowe dane</p>
@@ -300,6 +289,7 @@
             </div>
         </div>
     
+        <!-- Trzeci bottom_holder z przyciskiem "Aktualizuj" -->
         <div class="bottom_holder" style="height: 90px; margin-bottom: 120px;">
             <div class="bottom_update">
                 <div class="bottom_update_grid">
@@ -333,6 +323,7 @@
                 this.init();
             }
 
+            // Vertex shader z przesłanego kodu
             getVertexShaderSource() {
                 return `
                     uniform mat4 u_MVPMatrix;
@@ -350,6 +341,7 @@
                 `;
             }
 
+            // Fragment shader z przesłanego kodu - poprawiono kolory
             getFragmentShaderSource() {
                 return `
                     precision mediump float;
@@ -376,6 +368,7 @@
                         
                         vec4 holoMapColor = texture2D(u_HoloMapTexture, v_TextureCoordinates);
                         
+                        // Oryginalny algorytm z mObywatel - backgroundWeight kontroluje przezroczystość
                         float backgroundWeight = 1.0 - min(1.0, holoMapColor.r + holoMapColor.g + holoMapColor.b);
                         
                         vec3 hologramColor =
@@ -384,6 +377,7 @@
                             holoMapColor.b * blueHologramColor +
                             backgroundWeight * backgroundColor;
                         
+                        // Mieszanie z podstawową teksturą orła - orzeł pozostaje widoczny, hologram jest nakładką
                         vec3 finalColor = eagleColor.rgb * (1.0 - holoMapColor.a * 0.5) + hologramColor * holoMapColor.a * 0.5;
                         
                         gl_FragColor = vec4(finalColor, eagleColor.a);
@@ -426,6 +420,7 @@
                 const texture = this.gl.createTexture();
                 this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
                 
+                // Placeholder pixel podczas ładowania
                 this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, 1, 1, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 255, 255]));
                 
                 const image = new Image();
@@ -449,29 +444,31 @@
 
                 this.textures.background = this.loadTexture('pictures/hologram_background.webp');
                 this.textures.hologram = this.loadTexture('pictures/hologram_overlay.webp');
-                this.textures.holoMap = this.loadTexture('pictures/hologram_emblem_fake.png');
-                this.textures.eagle = this.loadTexture('pictures/hologram_emblem_top.webp');
+                this.textures.holoMap = this.loadTexture('pictures/hologram_emblem_fake.png'); // Mapa hologramu
+                this.textures.eagle = this.loadTexture('pictures/hologram_emblem_top.webp'); // Podstawowa tekstura orła
 
                 const vertices = new Float32Array([
-                    -1.0, -1.0, 0.0, 1.0,
-                     1.0, -1.0, 1.0, 1.0,
-                    -1.0,  1.0, 0.0, 0.0,
-                     1.0,  1.0, 1.0, 0.0
+                    -1.0, -1.0, 0.0, 1.0,  // Lewy dolny - tekstura Y=1.0
+                     1.0, -1.0, 1.0, 1.0,  // Prawy dolny - tekstura Y=1.0
+                    -1.0,  1.0, 0.0, 0.0,  // Lewy górny - tekstura Y=0.0
+                     1.0,  1.0, 1.0, 0.0   // Prawy górny - tekstura Y=0.0
                 ]);
 
                 this.vertexBuffer = this.gl.createBuffer();
                 this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
                 this.gl.bufferData(this.gl.ARRAY_BUFFER, vertices, this.gl.STATIC_DRAW);
 
+                // Atrybuty
                 this.positionLocation = this.gl.getAttribLocation(this.program, 'a_VertexPosition');
                 this.texCoordLocation = this.gl.getAttribLocation(this.program, 'a_TextureCoordinates');
                 
+                // Uniformy
                 this.mvpMatrixLocation = this.gl.getUniformLocation(this.program, 'u_MVPMatrix');
                 this.accelerometerLocation = this.gl.getUniformLocation(this.program, 'u_AccelerometerCoordinates');
                 this.backgroundTextureLocation = this.gl.getUniformLocation(this.program, 'u_BackgroundTexture');
                 this.hologramTextureLocation = this.gl.getUniformLocation(this.program, 'u_HologramTexture');
                 this.holoMapTextureLocation = this.gl.getUniformLocation(this.program, 'u_HoloMapTexture');
-                this.eagleTextureLocation = this.gl.getUniformLocation(this.program, 'u_EagleTexture');
+                this.eagleTextureLocation = this.gl.getUniformLocation(this.program, 'u_EagleTexture'); // Dodano uniform dla tekstury orła
 
                 this.render();
             }
@@ -486,14 +483,18 @@
 
                 this.gl.useProgram(this.program);
 
+                // Bind vertex buffer
                 this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
                 
+                // Position attribute
                 this.gl.enableVertexAttribArray(this.positionLocation);
                 this.gl.vertexAttribPointer(this.positionLocation, 2, this.gl.FLOAT, false, 16, 0);
                 
+                // Texture coordinate attribute
                 this.gl.enableVertexAttribArray(this.texCoordLocation);
                 this.gl.vertexAttribPointer(this.texCoordLocation, 2, this.gl.FLOAT, false, 16, 8);
 
+                // MVP Matrix (identity dla 2D)
                 const mvpMatrix = new Float32Array([
                     1, 0, 0, 0,
                     0, 1, 0, 0,
@@ -502,8 +503,10 @@
                 ]);
                 this.gl.uniformMatrix4fv(this.mvpMatrixLocation, false, mvpMatrix);
 
+                // Accelerometer coordinates
                 this.gl.uniform3fv(this.accelerometerLocation, this.accelerometerCoords);
 
+                // Bind textures
                 this.gl.activeTexture(this.gl.TEXTURE0);
                 this.gl.bindTexture(this.gl.TEXTURE_2D, this.textures.background);
                 this.gl.uniform1i(this.backgroundTextureLocation, 0);
@@ -520,216 +523,25 @@
                 this.gl.bindTexture(this.gl.TEXTURE_2D, this.textures.eagle);
                 this.gl.uniform1i(this.eagleTextureLocation, 3);
 
+                // Draw
                 this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, 4);
 
                 requestAnimationFrame(() => this.render());
             }
         }
 
-        class HologramFadeEffect {
-            constructor(canvasId) {
-                this.canvas = document.getElementById(canvasId);
-                this.gl = this.canvas.getContext('webgl') || this.canvas.getContext('experimental-webgl');
-                
-                if (!this.gl) {
-                    console.error('WebGL not supported for fade effect');
-                    return;
-                }
-
-                this.accelerometerCoords = [0.0, 0.0, 0.0];
-                this.textures = {};
-                this.program = null;
-                
-                this.init();
-            }
-
-            getVertexShaderSource() {
-                return `
-                    uniform mat4 u_MVPMatrix;
-                    attribute vec4 a_VertexPosition;
-                    attribute vec2 a_TextureCoordinates;
-                    varying vec2 v_TextureCoordinates;
-                    
-                    void main() {
-                        gl_Position = u_MVPMatrix * a_VertexPosition;
-                        v_TextureCoordinates = a_TextureCoordinates;
-                    }
-                `;
-            }
-
-            getFragmentShaderSource() {
-                return `
-                    precision mediump float;
-                    
-                    uniform sampler2D u_HologramTexture;
-                    uniform float u_Opacity;
-                    
-                    varying vec2 v_TextureCoordinates;
-                    
-                    void main() {
-                        vec4 hologramColor = texture2D(u_HologramTexture, v_TextureCoordinates);
-                        gl_FragColor = vec4(hologramColor.rgb, hologramColor.a * u_Opacity);
-                    }
-                `;
-            }
-
-            createShader(type, source) {
-                const shader = this.gl.createShader(type);
-                this.gl.shaderSource(shader, source);
-                this.gl.compileShader(shader);
-                
-                if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
-                    console.error('Shader compilation error:', this.gl.getShaderInfoLog(shader));
-                    this.gl.deleteShader(shader);
-                    return null;
-                }
-                
-                return shader;
-            }
-
-            createProgram() {
-                const vertexShader = this.createShader(this.gl.VERTEX_SHADER, this.getVertexShaderSource());
-                const fragmentShader = this.createShader(this.gl.FRAGMENT_SHADER, this.getFragmentShaderSource());
-                
-                const program = this.gl.createProgram();
-                this.gl.attachShader(program, vertexShader);
-                this.gl.attachShader(program, fragmentShader);
-                this.gl.linkProgram(program);
-                
-                if (!this.gl.getProgramParameter(program, this.gl.LINK_STATUS)) {
-                    console.error('Program linking error:', this.gl.getProgramInfoLog(program));
-                    return null;
-                }
-                
-                return program;
-            }
-
-            loadTexture(url) {
-                const texture = this.gl.createTexture();
-                this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
-                
-                this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, 1, 1, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 255, 255]));
-                
-                const image = new Image();
-                image.crossOrigin = 'anonymous';
-                image.onload = () => {
-                    this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
-                    this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, image);
-                    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
-                    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
-                    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
-                    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-                };
-                image.src = url;
-                
-                return texture;
-            }
-
-            init() {
-                this.program = this.createProgram();
-                if (!this.program) return;
-
-                this.textures.hologram = this.loadTexture('pictures/mid_background_main_dynamic.webp');
-
-                const vertices = new Float32Array([
-                    -1.0, -1.0, 0.0, 1.0,
-                     1.0, -1.0, 1.0, 1.0,
-                    -1.0,  1.0, 0.0, 0.0,
-                     1.0,  1.0, 1.0, 0.0
-                ]);
-
-                this.vertexBuffer = this.gl.createBuffer();
-                this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
-                this.gl.bufferData(this.gl.ARRAY_BUFFER, vertices, this.gl.STATIC_DRAW);
-
-                this.positionLocation = this.gl.getAttribLocation(this.program, 'a_VertexPosition');
-                this.texCoordLocation = this.gl.getAttribLocation(this.program, 'a_TextureCoordinates');
-                
-                this.mvpMatrixLocation = this.gl.getUniformLocation(this.program, 'u_MVPMatrix');
-                this.hologramTextureLocation = this.gl.getUniformLocation(this.program, 'u_HologramTexture');
-                this.opacityLocation = this.gl.getUniformLocation(this.program, 'u_Opacity');
-
-                this.render();
-            }
-
-            updateAccelerometer(x, y, z) {
-                this.accelerometerCoords = [x, y, z];
-            }
-
-            render() {
-                this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
-                this.gl.clearColor(0, 0, 0, 0);
-                this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-                this.gl.enable(this.gl.BLEND);
-                this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
-
-                this.gl.useProgram(this.program);
-
-                this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
-                
-                this.gl.enableVertexAttribArray(this.positionLocation);
-                this.gl.vertexAttribPointer(this.positionLocation, 2, this.gl.FLOAT, false, 16, 0);
-                
-                this.gl.enableVertexAttribArray(this.texCoordLocation);
-                this.gl.vertexAttribPointer(this.texCoordLocation, 2, this.gl.FLOAT, false, 16, 8);
-
-                const mvpMatrix = new Float32Array([
-                    1, 0, 0, 0,
-                    0, 1, 0, 0,
-                    0, 0, 1, 0,
-                    0, 0, 0, 1
-                ]);
-                this.gl.uniformMatrix4fv(this.mvpMatrixLocation, false, mvpMatrix);
-
-                const opacity = Math.abs(Math.sin(this.accelerometerCoords[0] * Math.PI)) * 0.8 + 0.2;
-                this.gl.uniform1f(this.opacityLocation, opacity);
-
-                this.gl.activeTexture(this.gl.TEXTURE0);
-                this.gl.bindTexture(this.gl.TEXTURE_2D, this.textures.hologram);
-                this.gl.uniform1i(this.hologramTextureLocation, 0);
-
-                this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, 4);
-
-                requestAnimationFrame(() => this.render());
-            }
-        }
-
+        // Inicjalizacja WebGL hologramu
         let hologramRenderer;
-        let hologramFadeEffect;
         let isGyroscopeEnabled = false;
 
         function initHologram() {
             const canvas = document.getElementById('hologramCanvas');
-            canvas.width = 84;
-            canvas.height = 106;
+            canvas.width = 84;  // 2x większa rozdzielczość
+            canvas.height = 106; // 2x większa rozdzielczość
             hologramRenderer = new HologramRenderer('hologramCanvas');
-
-            const fadeCanvas = document.getElementById('hologramFadeCanvas');
-            const idImageData = document.querySelector('.id_image_data');
-            const idImage = document.querySelector('.id_image');
-            
-            if (idImage && idImageData) {
-                fadeCanvas.width = idImage.offsetWidth;
-                fadeCanvas.height = idImage.offsetHeight;
-                hologramFadeEffect = new HologramFadeEffect('hologramFadeCanvas');
-            }
         }
 
-        function initFlagAnimation() {
-            const flagElement = document.getElementById('flagImage');
-            const totalFrames = 60;
-            let currentFrame = 0;
-
-            function updateFlag() {
-                flagElement.src = `flaga/flag_pl_${currentFrame.toString().padStart(2, '0')}.webp`;
-                currentFrame = (currentFrame + 1) % totalFrames;
-            }
-
-            // 50ms = 3 sekundy na całą animację (60 klatek * 50ms = 3000ms)
-            // Możesz zmienić tę wartość aby kontrolować prędkość
-            setInterval(updateFlag, 50);
-        }
-
+        // Funkcja do żądania pozwolenia na iOS
         function requestGyroscopePermission() {
             if (typeof DeviceOrientationEvent.requestPermission === 'function') {
                 DeviceOrientationEvent.requestPermission()
@@ -751,38 +563,50 @@
         }
 
         function handleOrientation(event) {
-            if (!isGyroscopeEnabled) return;
+            if (!isGyroscopeEnabled || !hologramRenderer) return;
 
-            const gamma = (event.gamma || 0) / 90.0;
+            const gamma = (event.gamma || 0) / 90.0; // Normalizacja do -1,1
             const beta = (event.beta || 0) / 90.0;
             const alpha = (event.alpha || 0) / 360.0;
 
-            if (hologramRenderer) {
-                hologramRenderer.updateAccelerometer(gamma, beta, alpha);
-            }
-            
-            if (hologramFadeEffect) {
-                hologramFadeEffect.updateAccelerometer(gamma, beta, alpha);
-            }
+            hologramRenderer.updateAccelerometer(gamma, beta, alpha);
         }
 
-        window.addEventListener('load', () => {
-            initHologram();
-            initFlagAnimation();
-        });
+        // Uruchomienie po załadowaniu strony
+        window.addEventListener('load', initHologram);
 
+        // Uruchom żyroskop po kliknięciu (wymagane na iOS)
         document.addEventListener('click', function() {
             if (!isGyroscopeEnabled) {
                 requestGyroscopePermission();
             }
         }, { once: true });
 
+        // Automatyczne uruchomienie na Androidzie
         if (navigator.userAgent.toLowerCase().indexOf('android') > -1) {
             setTimeout(() => {
                 isGyroscopeEnabled = true;
                 startGyroscope();
             }, 1000);
         }
+    </script>
+    <script>
+        // Animacja flagi z 60 klatek
+        const flagElement = document.getElementById('animatedFlag');
+        const totalFrames = 60;
+        let currentFrame = 0;
+
+        function updateFlag() {
+            // Ścieżka do zdjęć flagi - dostosuj jeśli potrzeba
+            flagElement.src = `pictures/flag_pl_${currentFrame.toString().padStart(2, '0')}.webp`;
+            currentFrame = (currentFrame + 1) % totalFrames;
+        }
+
+        // Uruchom animację co 100ms (możesz zmienić opóźnienie tutaj)
+        setInterval(updateFlag, 100);
+        
+        // Załaduj pierwszą klatkę od razu
+        updateFlag();
     </script>
     <script>
     document.addEventListener("DOMContentLoaded", () => {
@@ -811,10 +635,12 @@
             return `${d}.${m}.${y}`;
         }
 
+        // 🔒 Pobierz dane z localStorage
         let serial = localStorage.getItem("seria_numer");
         let issueDate = localStorage.getItem("wydany");
         let expiryDate = localStorage.getItem("waznosc");
 
+        // Jeśli brak → wygeneruj nowe i zapisz
         if (!serial || !issueDate || !expiryDate) {
             serial = generateSerialNumber();
             const issue = getRandomIssueDate();
@@ -829,10 +655,10 @@
             localStorage.setItem("waznosc", expiryDate);
         }
 
+        // 🖊️ Wstaw dane do strony
         document.getElementById("seria_numer").textContent = serial;
         document.getElementById("wydany").textContent = issueDate;
         document.getElementById("waznosc").textContent = expiryDate;
     });
 </script>
 </body>
-</html>
