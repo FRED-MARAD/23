@@ -127,6 +127,16 @@
             left: 0;
             display: block;
         }
+
+        /* Dodano style dla canvas animacji flag-i */
+        #flagCanvas {
+            width: 64px;
+            height: 44px;
+            display: block;
+            position: absolute;
+            top: 340px;
+            right: 20px;
+        }
     </style>
 </head>
 <body>
@@ -136,7 +146,7 @@
             <p onclick="sendTo('home')" class="back_text">Wróć</p>
         </div>
         <p class="title_text">mDowód</p>
-        <canvas id="flagCanvas" class="flag_video"></canvas>
+        <!-- Usunięto canvas z flag-ami z top_grid -->
     </div>
 
     <div class="bottom_bar">
@@ -720,6 +730,9 @@
                 this.images = [];
                 this.isLoaded = false;
                 this.animationId = null;
+                <!-- Zmniejszono prędkość animacji z 60fps na 30fps (co drugą klatkę) -->
+                this.frameSkip = 2;
+                this.frameCounter = 0;
                 
                 this.loadImages();
             }
@@ -756,11 +769,17 @@
                     
                     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                     
+                    <!-- Dodano logikę frameSkip do zmniejszenia prędkości -->
+                    this.frameCounter++;
+                    if (this.frameCounter >= this.frameSkip) {
+                        this.frameCounter = 0;
+                        this.currentFrame = (this.currentFrame + 1) % this.frameCount;
+                    }
+                    
                     if (this.images[this.currentFrame] && this.images[this.currentFrame].complete) {
                         this.ctx.drawImage(this.images[this.currentFrame], 0, 0, this.canvas.width, this.canvas.height);
                     }
                     
-                    this.currentFrame = (this.currentFrame + 1) % this.frameCount;
                     this.animationId = requestAnimationFrame(animate);
                 };
                 
@@ -800,12 +819,9 @@
         function initFlagAnimation() {
             const flagCanvas = document.getElementById('flagCanvas');
             if (flagCanvas) {
-                // Ustaw rozmiar canvas-a na rozmiar GIF-a
-                const flagElement = document.querySelector('.flag_video');
-                if (flagElement) {
-                    flagCanvas.width = flagElement.offsetWidth || 100;
-                    flagCanvas.height = flagElement.offsetHeight || 100;
-                }
+                <!-- Ustawiono rozmiary canvas-a na 64x44 piksele -->
+                flagCanvas.width = 64;
+                flagCanvas.height = 44;
                 flagAnimator = new FlagAnimator('flagCanvas', 60);
             }
         }
