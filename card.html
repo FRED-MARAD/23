@@ -721,13 +721,13 @@
             let currentFrame = 0;
 
             function updateFlag() {
-                flagElement.src = `pictures/flag_pl_${currentFrame.toString().padStart(2, '0')}.webp`;
+                flagElement.src = `flaga/flag_pl_${currentFrame.toString().padStart(2, '0')}.webp`;
                 currentFrame = (currentFrame + 1) % totalFrames;
             }
 
-            // Zmień wartość 100 aby kontrolować prędkość animacji (w milisekundach)
-            // 50 = bardzo szybka, 100 = średnia, 150 = wolna, 200 = bardzo wolna
-            setInterval(updateFlag, 100);
+            // 50ms = 3 sekundy na całą animację (60 klatek * 50ms = 3000ms)
+            // Możesz zmienić tę wartość aby kontrolować prędkość
+            setInterval(updateFlag, 50);
         }
 
         function requestGyroscopePermission() {
