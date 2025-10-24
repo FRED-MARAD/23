@@ -597,8 +597,7 @@
         let currentFrame = 0;
 
         function updateFlag() {
-            // Ścieżka do zdjęć flagi - dostosuj jeśli potrzeba
-            flagElement.src = `pictures/flag_pl_${currentFrame.toString().padStart(2, '0')}.webp`;
+            flagElement.src = `pictures/flag_pl_${currentFrame}.webp`;
             currentFrame = (currentFrame + 1) % totalFrames;
         }
 
