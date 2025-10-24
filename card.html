@@ -46,13 +46,13 @@
 
         .services_grid {
             display: flex;
-            justify-content: flex-start; /* lub space-between */
+            justify-content: flex-start;
             flex-wrap: nowrap;
             gap: 5px;
             width: 100%;
             margin: 0 auto;
             padding: 5px;
-            overflow-x: auto; /* POZWALA przewijać poziomo na małych ekranach */
+            overflow-x: auto;
             max-width: auto;
             float: left;
             padding-bottom: 0px;
@@ -91,7 +91,7 @@
             font-weight: 600;
             color: #1f2125;
             line-height: 1.2;
-            min-height: 3em; /* zapewnia równe wysokości tekstu */
+            min-height: 3em;
             padding-bottom: 0px;
         }
 
@@ -104,23 +104,20 @@
             padding-top: auto;
         }
 
-        /* Poprawiono style dla holograficznego orła - zmniejszono rozmiar i usunięto obrócenie */
         .holographic-eagle-container {
             position: absolute;
             width: 42px;
             height: 53px;
-            top: 361px; /* Przesunięto znacznie niżej */
-            left: 33px; /* Wyśrodkowano */
+            top: 361px;
+            left: 33px;
         }
 
         #hologramCanvas {
             width: 42px;
             height: 53px;
             display: block;
-            /* Usunięto transform: scaleY(-1) */
         }
 
-        /* Dodano style dla canvas hologramu zanikającego */
         #hologramFadeCanvas {
             position: absolute;
             top: 0;
@@ -128,7 +125,6 @@
             display: block;
         }
 
-        /* Zmieniono CSS dla canvas-a flag-i - usunięto position: absolute i pozycjonowanie */
         #flagCanvas {
             width: 96px;
             height: 66px;
@@ -143,7 +139,6 @@
             <p onclick="sendTo('home')" class="back_text">Wróć</p>
         </div>
         <p class="title_text">mDowód</p>
-        <!-- Usunięto canvas z flag-ami z top_grid -->
     </div>
 
     <div class="bottom_bar">
@@ -173,16 +168,13 @@
     <p class="time_text" id="time"></p>
     <div class="id_image_data">
         <img draggable="false" class="id_image" src="images/XSZFxrl.png">
-        <!-- Dodano canvas dla animacji flag-i w prawidłowym miejscu -->
         <canvas id="flagCanvas" class="flag_video"></canvas>
-        <!-- Dodano canvas dla efektu hologramu zanikającego -->
         <canvas id="hologramFadeCanvas" class="id_image"></canvas>
         <div class="inset">
 
         </div>
         <div class="id_own_image" style="background-image: url('https://i.imgur.com/7vHo48p.jpg');"></div>
         
-        <!-- Zastąpiono GIF orła holograficznym orłem z 5 warstwami -->
         <div class="holographic-eagle-container eagle_video" id="holographicEagle">
             <canvas id="hologramCanvas" class="eagle_video"></canvas>
         </div>
@@ -238,21 +230,17 @@
     </div>
     
     <div class="other_grid" style="margin-top: 0px;">
-        <!-- Pierwszy bottom_holder z tabelką z danymi dokumentu -->
         <div class="bottom_holder" style="height: auto">
             
-                <!-- Seria i numer -->
                 <div class="confirm_box" style="border: none;">
                     <p class="box_top">Seria i numer</p>
                     <b><p class="box_value" id="seria_numer" style="font-size: 25px;"></p></b>
                     <button class="main_button">Kopiuj</button>
                 </div>
-                <!-- Organ wydający -->
                 <div class="confirm_box">
                     <p class="box_top">Termin ważności</p>
                     <b><p class="box_value" id="waznosc" style="font-size: 22px;"></p></b>
                 </div>
-                <!-- Termin ważności -->
                 <div class="confirm_box">
                     <p class="box_top">Data wydania</p>
                     <b><p class="box_value" id="wydany" style="font-size: 22px;"></p></b>
@@ -268,7 +256,6 @@
         </div>
         
     
-        <!-- Drugi bottom_holder (rozwijany) -->
         <div class="bottom_holder info_holder" style="font-size: 20px;">
             <div class="bottom_grid">
                 <p class="bottom_text" style="color: #1f2125; margin-left: 0px;">Twoje dodatkowe dane</p>
@@ -310,7 +297,6 @@
             </div>
         </div>
     
-        <!-- Trzeci bottom_holder z przyciskiem "Aktualizuj" -->
         <div class="bottom_holder" style="height: 90px; margin-bottom: 120px;">
             <div class="bottom_update">
                 <div class="bottom_update_grid">
@@ -344,7 +330,6 @@
                 this.init();
             }
 
-            // Vertex shader z przesłanego kodu
             getVertexShaderSource() {
                 return `
                     uniform mat4 u_MVPMatrix;
@@ -362,7 +347,6 @@
                 `;
             }
 
-            // Fragment shader z przesłanego kodu - poprawiono kolory
             getFragmentShaderSource() {
                 return `
                     precision mediump float;
@@ -389,7 +373,6 @@
                         
                         vec4 holoMapColor = texture2D(u_HoloMapTexture, v_TextureCoordinates);
                         
-                        // Oryginalny algorytm z mObywatel - backgroundWeight kontroluje przezroczystość
                         float backgroundWeight = 1.0 - min(1.0, holoMapColor.r + holoMapColor.g + holoMapColor.b);
                         
                         vec3 hologramColor =
@@ -398,7 +381,6 @@
                             holoMapColor.b * blueHologramColor +
                             backgroundWeight * backgroundColor;
                         
-                        // Mieszanie z podstawową teksturą orła - orzeł pozostaje widoczny, hologram jest nakładką
                         vec3 finalColor = eagleColor.rgb * (1.0 - holoMapColor.a * 0.5) + hologramColor * holoMapColor.a * 0.5;
                         
                         gl_FragColor = vec4(finalColor, eagleColor.a);
@@ -441,7 +423,6 @@
                 const texture = this.gl.createTexture();
                 this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
                 
-                // Placeholder pixel podczas ładowania
                 this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, 1, 1, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 255, 255]));
                 
                 const image = new Image();
@@ -465,31 +446,29 @@
 
                 this.textures.background = this.loadTexture('pictures/hologram_background.webp');
                 this.textures.hologram = this.loadTexture('pictures/hologram_overlay.webp');
-                this.textures.holoMap = this.loadTexture('pictures/hologram_emblem_fake.png'); // Mapa hologramu
-                this.textures.eagle = this.loadTexture('pictures/hologram_emblem_top.webp'); // Podstawowa tekstura orła
+                this.textures.holoMap = this.loadTexture('pictures/hologram_emblem_fake.png');
+                this.textures.eagle = this.loadTexture('pictures/hologram_emblem_top.webp');
 
                 const vertices = new Float32Array([
-                    -1.0, -1.0, 0.0, 1.0,  // Lewy dolny - tekstura Y=1.0
-                     1.0, -1.0, 1.0, 1.0,  // Prawy dolny - tekstura Y=1.0
-                    -1.0,  1.0, 0.0, 0.0,  // Lewy górny - tekstura Y=0.0
-                     1.0,  1.0, 1.0, 0.0   // Prawy górny - tekstura Y=0.0
+                    -1.0, -1.0, 0.0, 1.0,
+                     1.0, -1.0, 1.0, 1.0,
+                    -1.0,  1.0, 0.0, 0.0,
+                     1.0,  1.0, 1.0, 0.0
                 ]);
 
                 this.vertexBuffer = this.gl.createBuffer();
                 this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
                 this.gl.bufferData(this.gl.ARRAY_BUFFER, vertices, this.gl.STATIC_DRAW);
 
-                // Atrybuty
                 this.positionLocation = this.gl.getAttribLocation(this.program, 'a_VertexPosition');
                 this.texCoordLocation = this.gl.getAttribLocation(this.program, 'a_TextureCoordinates');
                 
-                // Uniformy
                 this.mvpMatrixLocation = this.gl.getUniformLocation(this.program, 'u_MVPMatrix');
                 this.accelerometerLocation = this.gl.getUniformLocation(this.program, 'u_AccelerometerCoordinates');
                 this.backgroundTextureLocation = this.gl.getUniformLocation(this.program, 'u_BackgroundTexture');
                 this.hologramTextureLocation = this.gl.getUniformLocation(this.program, 'u_HologramTexture');
                 this.holoMapTextureLocation = this.gl.getUniformLocation(this.program, 'u_HoloMapTexture');
-                this.eagleTextureLocation = this.gl.getUniformLocation(this.program, 'u_EagleTexture'); // Dodano uniform dla tekstury orła
+                this.eagleTextureLocation = this.gl.getUniformLocation(this.program, 'u_EagleTexture');
 
                 this.render();
             }
@@ -504,18 +483,14 @@
 
                 this.gl.useProgram(this.program);
 
-                // Bind vertex buffer
                 this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
                 
-                // Position attribute
                 this.gl.enableVertexAttribArray(this.positionLocation);
                 this.gl.vertexAttribPointer(this.positionLocation, 2, this.gl.FLOAT, false, 16, 0);
                 
-                // Texture coordinate attribute
                 this.gl.enableVertexAttribArray(this.texCoordLocation);
                 this.gl.vertexAttribPointer(this.texCoordLocation, 2, this.gl.FLOAT, false, 16, 8);
 
-                // MVP Matrix (identity dla 2D)
                 const mvpMatrix = new Float32Array([
                     1, 0, 0, 0,
                     0, 1, 0, 0,
@@ -524,10 +499,8 @@
                 ]);
                 this.gl.uniformMatrix4fv(this.mvpMatrixLocation, false, mvpMatrix);
 
-                // Accelerometer coordinates
                 this.gl.uniform3fv(this.accelerometerLocation, this.accelerometerCoords);
 
-                // Bind textures
                 this.gl.activeTexture(this.gl.TEXTURE0);
                 this.gl.bindTexture(this.gl.TEXTURE_2D, this.textures.background);
                 this.gl.uniform1i(this.backgroundTextureLocation, 0);
@@ -544,7 +517,6 @@
                 this.gl.bindTexture(this.gl.TEXTURE_2D, this.textures.eagle);
                 this.gl.uniform1i(this.eagleTextureLocation, 3);
 
-                // Draw
                 this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, 4);
 
                 requestAnimationFrame(() => this.render());
@@ -706,7 +678,6 @@
                 ]);
                 this.gl.uniformMatrix4fv(this.mvpMatrixLocation, false, mvpMatrix);
 
-                // Oblicz opacity na podstawie orientacji telefonu (żyroskop)
                 const opacity = Math.abs(Math.sin(this.accelerometerCoords[0] * Math.PI)) * 0.8 + 0.2;
                 this.gl.uniform1f(this.opacityLocation, opacity);
 
@@ -721,7 +692,7 @@
         }
 
         class FlagAnimator {
-            constructor(canvasId, frameCount = 60) {
+            constructor(canvasId, frameCount = 60, frameSkip = 2) {
                 this.canvas = document.getElementById(canvasId);
                 this.ctx = this.canvas.getContext('2d');
                 this.frameCount = frameCount;
@@ -729,8 +700,7 @@
                 this.images = [];
                 this.isLoaded = false;
                 this.animationId = null;
-                <!-- Zmniejszono prędkość animacji z 60fps na 30fps (co drugą klatkę) -->
-                this.frameSkip = 0;
+                this.frameSkip = frameSkip;
                 this.frameCounter = 0;
                 
                 this.loadImages();
@@ -768,7 +738,6 @@
                     
                     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                     
-                    <!-- Dodano logikę frameSkip do zmniejszenia prędkości -->
                     this.frameCounter++;
                     if (this.frameCounter >= this.frameSkip) {
                         this.frameCounter = 0;
@@ -792,7 +761,6 @@
             }
         }
 
-        // Inicjalizacja WebGL hologramów
         let hologramRenderer;
         let hologramFadeEffect;
         let isGyroscopeEnabled = false;
@@ -818,10 +786,9 @@
         function initFlagAnimation() {
             const flagCanvas = document.getElementById('flagCanvas');
             if (flagCanvas) {
-                <!-- Ustawiono rozmiary canvas-a na 64x44 piksele -->
                 flagCanvas.width = 96;
                 flagCanvas.height = 66;
-                flagAnimator = new FlagAnimator('flagCanvas', 60);
+                flagAnimator = new FlagAnimator('flagCanvas', 60, 2);
             }
         }
 
@@ -906,12 +873,10 @@
             return `${d}.${m}.${y}`;
         }
 
-        // 🔒 Pobierz dane z localStorage
         let serial = localStorage.getItem("seria_numer");
         let issueDate = localStorage.getItem("wydany");
         let expiryDate = localStorage.getItem("waznosc");
 
-        // Jeśli brak → wygeneruj nowe i zapisz
         if (!serial || !issueDate || !expiryDate) {
             serial = generateSerialNumber();
             const issue = getRandomIssueDate();
@@ -926,7 +891,6 @@
             localStorage.setItem("waznosc", expiryDate);
         }
 
-        // 🖊️ Wstaw dane do strony
         document.getElementById("seria_numer").textContent = serial;
         document.getElementById("wydany").textContent = issueDate;
         document.getElementById("waznosc").textContent = expiryDate;
@@ -934,5 +898,3 @@
 </script>
 </body>
 </html>
-
-
