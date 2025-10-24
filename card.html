@@ -109,7 +109,7 @@
             position: absolute;
             width: 42px;
             height: 53px;
-            top: 311px; /* Przesunięto znacznie niżej */
+            top: 360px; /* Przesunięto znacznie niżej */
             left: 33px; /* Wyśrodkowano */
         }
 
@@ -130,8 +130,8 @@
 
         /* Zmieniono CSS dla canvas-a flag-i - usunięto position: absolute i pozycjonowanie */
         #flagCanvas {
-            width: 256px;
-            height: 172px;
+            width: 128px;
+            height: 88px;
             display: block;
         }
     </style>
@@ -819,8 +819,8 @@
             const flagCanvas = document.getElementById('flagCanvas');
             if (flagCanvas) {
                 <!-- Ustawiono rozmiary canvas-a na 64x44 piksele -->
-                flagCanvas.width = 256;
-                flagCanvas.height = 172;
+                flagCanvas.width = 128;
+                flagCanvas.height = 88;
                 flagAnimator = new FlagAnimator('flagCanvas', 60);
             }
         }
@@ -934,3 +934,4 @@
 </script>
 </body>
 </html>
+
