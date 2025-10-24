@@ -729,8 +729,9 @@
                 this.images = [];
                 this.isLoaded = false;
                 this.animationId = null;
-                this.frameDelay = 50; // milisekundy między każdą klatką (50ms = 20fps, zmień na 33 dla 30fps, 100 dla 10fps)
-                this.lastFrameTime = Date.now();
+                <!-- Zmniejszono prędkość animacji z 60fps na 30fps (co drugą klatkę) -->
+                this.frameSkip = 0;
+                this.frameCounter = 0;
                 
                 this.loadImages();
             }
@@ -767,9 +768,10 @@
                     
                     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                     
-                    const now = Date.now();
-                    if (now - this.lastFrameTime >= this.frameDelay) {
-                        this.lastFrameTime = now;
+                    <!-- Dodano logikę frameSkip do zmniejszenia prędkości -->
+                    this.frameCounter++;
+                    if (this.frameCounter >= this.frameSkip) {
+                        this.frameCounter = 0;
                         this.currentFrame = (this.currentFrame + 1) % this.frameCount;
                     }
                     
@@ -789,23 +791,6 @@
                 }
             }
         }
-
-        function initFlagAnimation() {
-            const flagCanvas = document.getElementById('flagCanvas');
-            if (flagCanvas) {
-                flagCanvas.width = 96;
-                flagCanvas.height = 66;
-                flagAnimator = new FlagAnimator('flagCanvas', 60);
-            }
-        }
-
-        /* Zmieniono CSS dla canvas-a flag-i - usunięto position: absolute i pozycjonowanie */
-        #flagCanvas {
-            width: 96px;
-            height: 66px;
-            display: block;
-        }
-
 
         // Inicjalizacja WebGL hologramów
         let hologramRenderer;
