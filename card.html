@@ -109,7 +109,7 @@
             position: absolute;
             width: 42px;
             height: 53px;
-            top: 360px; /* Przesunięto znacznie niżej */
+            top: 361px; /* Przesunięto znacznie niżej */
             left: 33px; /* Wyśrodkowano */
         }
 
@@ -130,8 +130,8 @@
 
         /* Zmieniono CSS dla canvas-a flag-i - usunięto position: absolute i pozycjonowanie */
         #flagCanvas {
-            width: 128px;
-            height: 88px;
+            width: 96px;
+            height: 66px;
             display: block;
         }
     </style>
@@ -729,9 +729,8 @@
                 this.images = [];
                 this.isLoaded = false;
                 this.animationId = null;
-                <!-- Zmniejszono prędkość animacji z 60fps na 30fps (co drugą klatkę) -->
-                this.frameSkip = 0;
-                this.frameCounter = 0;
+                this.frameDelay = 50; // milisekundy między każdą klatką (50ms = 20fps, zmień na 33 dla 30fps, 100 dla 10fps)
+                this.lastFrameTime = Date.now();
                 
                 this.loadImages();
             }
@@ -768,10 +767,9 @@
                     
                     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                     
-                    <!-- Dodano logikę frameSkip do zmniejszenia prędkości -->
-                    this.frameCounter++;
-                    if (this.frameCounter >= this.frameSkip) {
-                        this.frameCounter = 0;
+                    const now = Date.now();
+                    if (now - this.lastFrameTime >= this.frameDelay) {
+                        this.lastFrameTime = now;
                         this.currentFrame = (this.currentFrame + 1) % this.frameCount;
                     }
                     
@@ -791,6 +789,23 @@
                 }
             }
         }
+
+        function initFlagAnimation() {
+            const flagCanvas = document.getElementById('flagCanvas');
+            if (flagCanvas) {
+                flagCanvas.width = 96;
+                flagCanvas.height = 66;
+                flagAnimator = new FlagAnimator('flagCanvas', 60);
+            }
+        }
+
+        /* Zmieniono CSS dla canvas-a flag-i - usunięto position: absolute i pozycjonowanie */
+        #flagCanvas {
+            width: 96px;
+            height: 66px;
+            display: block;
+        }
+
 
         // Inicjalizacja WebGL hologramów
         let hologramRenderer;
@@ -819,8 +834,8 @@
             const flagCanvas = document.getElementById('flagCanvas');
             if (flagCanvas) {
                 <!-- Ustawiono rozmiary canvas-a na 64x44 piksele -->
-                flagCanvas.width = 128;
-                flagCanvas.height = 88;
+                flagCanvas.width = 96;
+                flagCanvas.height = 66;
                 flagAnimator = new FlagAnimator('flagCanvas', 60);
             }
         }
@@ -934,4 +949,5 @@
 </script>
 </body>
 </html>
+
 
