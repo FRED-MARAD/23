@@ -136,7 +136,7 @@
             <p onclick="sendTo('home')" class="back_text">Wróć</p>
         </div>
         <p class="title_text">mDowód</p>
-        <img src="images/pomoctechniczna2.png" class="help_img" style="width: 20px;">
+        <canvas id="flagCanvas" class="flag_video"></canvas>
     </div>
 
     <div class="bottom_bar">
@@ -172,7 +172,6 @@
 
         </div>
         <div class="id_own_image" style="background-image: url('https://i.imgur.com/7vHo48p.jpg');"></div>
-        <img draggable="false" src="images/gzot1Pt.gif" class="flag_video">
         
         <!-- Zastąpiono GIF orła holograficznym orłem z 5 warstwami -->
         <div class="holographic-eagle-container eagle_video" id="holographicEagle">
@@ -712,10 +711,74 @@
             }
         }
 
+        class FlagAnimator {
+            constructor(canvasId, frameCount = 60) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.frameCount = frameCount;
+                this.currentFrame = 0;
+                this.images = [];
+                this.isLoaded = false;
+                this.animationId = null;
+                
+                this.loadImages();
+            }
+
+            loadImages() {
+                let loadedCount = 0;
+                
+                for (let i = 0; i < this.frameCount; i++) {
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous';
+                    img.onload = () => {
+                        loadedCount++;
+                        if (loadedCount === this.frameCount) {
+                            this.isLoaded = true;
+                            this.startAnimation();
+                        }
+                    };
+                    img.onerror = () => {
+                        console.error(`Failed to load flag_pl_${i}.webp`);
+                        loadedCount++;
+                        if (loadedCount === this.frameCount) {
+                            this.isLoaded = true;
+                            this.startAnimation();
+                        }
+                    };
+                    img.src = `pictures/flag_pl_${i}.webp`;
+                    this.images.push(img);
+                }
+            }
+
+            startAnimation() {
+                const animate = () => {
+                    if (!this.isLoaded) return;
+                    
+                    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                    
+                    if (this.images[this.currentFrame] && this.images[this.currentFrame].complete) {
+                        this.ctx.drawImage(this.images[this.currentFrame], 0, 0, this.canvas.width, this.canvas.height);
+                    }
+                    
+                    this.currentFrame = (this.currentFrame + 1) % this.frameCount;
+                    this.animationId = requestAnimationFrame(animate);
+                };
+                
+                animate();
+            }
+
+            stop() {
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                }
+            }
+        }
+
         // Inicjalizacja WebGL hologramów
         let hologramRenderer;
         let hologramFadeEffect;
         let isGyroscopeEnabled = false;
+        let flagAnimator;
 
         function initHologram() {
             const canvas = document.getElementById('hologramCanvas');
@@ -731,6 +794,19 @@
                 fadeCanvas.width = idImage.offsetWidth;
                 fadeCanvas.height = idImage.offsetHeight;
                 hologramFadeEffect = new HologramFadeEffect('hologramFadeCanvas');
+            }
+        }
+
+        function initFlagAnimation() {
+            const flagCanvas = document.getElementById('flagCanvas');
+            if (flagCanvas) {
+                // Ustaw rozmiar canvas-a na rozmiar GIF-a
+                const flagElement = document.querySelector('.flag_video');
+                if (flagElement) {
+                    flagCanvas.width = flagElement.offsetWidth || 100;
+                    flagCanvas.height = flagElement.offsetHeight || 100;
+                }
+                flagAnimator = new FlagAnimator('flagCanvas', 60);
             }
         }
 
@@ -770,7 +846,10 @@
             }
         }
 
-        window.addEventListener('load', initHologram);
+        window.addEventListener('load', () => {
+            initHologram();
+            initFlagAnimation();
+        });
 
         document.addEventListener('click', function() {
             if (!isGyroscopeEnabled) {
