@@ -692,7 +692,7 @@
         }
 
         class FlagAnimator {
-            constructor(canvasId, frameCount = 60, frameSkip = 2) {
+            constructor(canvasId, frameCount = 60, frameDelay = 3) {
                 this.canvas = document.getElementById(canvasId);
                 this.ctx = this.canvas.getContext('2d');
                 this.frameCount = frameCount;
@@ -700,7 +700,13 @@
                 this.images = [];
                 this.isLoaded = false;
                 this.animationId = null;
-                this.frameSkip = frameSkip;
+                // frameDelay kontroluje ile klatek animacji czekać przed pokazaniem następnego obrazka
+                // Wyższa wartość = wolniejsza animacja (każdy obrazek jest wyświetlany dłużej)
+                // frameDelay = 1: pełna prędkość (60fps)
+                // frameDelay = 2: połowa prędkości (30fps)
+                // frameDelay = 3: 20fps
+                // frameDelay = 4: 15fps
+                this.frameDelay = frameDelay;
                 this.frameCounter = 0;
                 
                 this.loadImages();
@@ -738,12 +744,16 @@
                     
                     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                     
+                    // Zwiększ licznik klatek
                     this.frameCounter++;
-                    if (this.frameCounter >= this.frameSkip) {
+                    
+                    // Przejdź do następnego obrazka tylko gdy licznik osiągnie frameDelay
+                    if (this.frameCounter >= this.frameDelay) {
                         this.frameCounter = 0;
                         this.currentFrame = (this.currentFrame + 1) % this.frameCount;
                     }
                     
+                    // Rysuj aktualny obrazek
                     if (this.images[this.currentFrame] && this.images[this.currentFrame].complete) {
                         this.ctx.drawImage(this.images[this.currentFrame], 0, 0, this.canvas.width, this.canvas.height);
                     }
@@ -788,7 +798,9 @@
             if (flagCanvas) {
                 flagCanvas.width = 96;
                 flagCanvas.height = 66;
-                flagAnimator = new FlagAnimator('flagCanvas', 60, 2);
+                // Zmień wartość 3 na wyższą aby spowolnić animację (np. 4, 5, 6)
+                // lub na niższą aby przyspieszyć (np. 2, 1)
+                flagAnimator = new FlagAnimator('flagCanvas', 60, 3);
             }
         }
 
