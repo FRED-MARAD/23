@@ -692,7 +692,7 @@
         }
 
         class FlagAnimator {
-            constructor(canvasId, frameCount = 60, frameDelayMs = 100) {
+            constructor(canvasId, frameCount = 60, frameDelayMs = 50) {
                 this.canvas = document.getElementById(canvasId);
                 this.ctx = this.canvas.getContext('2d');
                 this.frameCount = frameCount;
@@ -911,3 +911,4 @@
 </script>
 </body>
 </html>
+
